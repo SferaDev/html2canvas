@@ -15,6 +15,7 @@ export type Options = CloneOptions &
         foreignObjectRendering: boolean;
         logging: boolean;
         removeContainer?: boolean;
+        window: Window;
     };
 
 const parseColor = (value: string): Color => color.parse(Parser.create(value).parseComponentValue());
@@ -24,10 +25,6 @@ const html2canvas = (element: HTMLElement, options: Partial<Options> = {}): Prom
 };
 
 export default html2canvas;
-
-if (typeof window !== 'undefined') {
-    CacheStorage.setContext(window);
-}
 
 const renderElement = async (element: HTMLElement, opts: Partial<Options>): Promise<HTMLCanvasElement> => {
     const ownerDocument = element.ownerDocument;
@@ -71,10 +68,15 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         y: top,
         width: Math.ceil(width),
         height: Math.ceil(height),
-        id: instanceName
+        id: instanceName,
+        window: window,
     };
 
     const options: Options = {...defaultOptions, ...resourceOptions, ...opts};
+
+    if (typeof options.window !== 'undefined') {
+        CacheStorage.setContext(options.window);
+    }
 
     const windowBounds = new Bounds(options.scrollX, options.scrollY, options.windowWidth, options.windowHeight);
 
